@@ -1,0 +1,148 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.0.0/dist/mindar-image.prod.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.0.0/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+  </head>
+
+  <script>
+    count = true;
+    AFRAME.registerComponent('mytarget', {
+      init: function () {
+        console.log("init");
+        this.el.addEventListener('targetFound', event => {
+          setTimeout(function () {storyBottle.setAttribute("visible", true)}, 2000);
+          setTimeout(function () {textNotes.setAttribute("visible", true)}, 2500);
+          setTimeout(function () {textAssemb.setAttribute("visible", true)}, 3000);
+          setTimeout(function () {textVideo.setAttribute("visible", true)}, 3500);
+          console.log("target found", event);
+        })
+        this.el.addEventListener('targetLost', event => {
+          console.log("target lost", event);
+        })
+      }
+    });
+  </script>
+
+  <style>
+    #visibleNone{
+      display: none;
+    }
+
+
+    .fade-in {
+      -webkit-animation-name: fadeInOpacity;
+              animation-name: fadeInOpacity;
+      -webkit-animation-iteration-count: 1;
+              animation-iteration-count: 1;
+      -webkit-animation-timing-function: ease-in;
+              animation-timing-function: ease-in;
+      -webkit-animation-duration: 6s;
+              animation-duration: 6s;
+    }
+
+    @-webkit-keyframes fadeInOpacity {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes fadeInOpacity {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .box{
+      width: 90vw;
+      height: 60vh;
+      background-color: black;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      color: white;
+      text-align: center;
+      padding: 40vw 5vw;
+      z-index: 999;
+      font-size: 30px;
+      font-weight: bold;
+      font-family: Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      max-width: 100vw;
+      max-height: 100vh;
+    }
+  </style>
+
+  <body>
+
+
+    <div id="overlayWelcom" class="fade-in box">Bonjour Gilles !</br></br> D&eacute;crouvrez une exp&eacute;rience inattendue sur votre bouteille de champagne Henriot</div>
+
+    <a-scene mindar-image="imageTargetSrc: ./targetsE.mind " color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+
+      <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"
+      raycaster="far: 10000; objects: .clickable"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0" id="mytarget" mytarget position="0.5 0 0">
+        <a-text value="Story Bottle" id="storyBottle" visible="false" color="black" align="center" width="6" position="-0.2 1.2 0.2"></a-text>
+        <a-image id="textNotes" src="./src/assets/textNotes.png" visible="false" position="-0.6 0.4 0" height="0.6" width="1.2" rotation="0 0 0"></a-image>
+        <a-image id="textAssemb" visible="false" src="./src/assets/textAssemblage.png" class="clickable" position="0.6 0 0.4" height="0.8" width=".8" rotation="0 0 0"></a-image>
+        <a-video id="henriot-video-link" visible="false" class="clickable" webkit-playsinline playsinline width="1.5" height="0.7"
+              position="-0.6 -0.4 0"></a-video>
+        <a-image id="henriot-preview-button" class="clickable" src="./src/assets/playVideo.png" alpha-test="0.5"
+        position="-0.6 -0.4 0.2" height="0.7" width="1.4">
+        </a-image>
+        <a-image id="textVideo" src="./src/assets/text-video.png" visible="false" position="-1 -0.9 0.2" height="0.2" width="0.3" rotation="0 0 0"></a-image>
+        <!-- <a-gltf-model id="avatar" rotation="0 0 0" position="0.3 -0.25 -0.2" scale="8 8 8" src="./src/assets/scene.gltf" animation="property: position; to: 0.1 0 0; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+        </a-gltf-model> -->
+      </a-entity>
+
+    </a-scene>
+
+    <script>
+    const henriotPreviewButton = document.querySelector("#henriot-preview-button");
+    const videoPlayer = document.querySelector('#henriot-video-link');
+    const textAssemb = document.querySelector("#textAssemb");
+    const overlayWelcom = document.querySelector("#overlayWelcom");
+
+    const storyBottle = document.querySelector("#storyBottle");
+    const textNotes = document.querySelector("#textNotes");
+    const textVideo = document.querySelector("#textVideo");
+    
+    setTimeout(function () {overlayWelcom.id="visibleNone";}, 5700);
+
+    henriotPreviewButton.addEventListener('click', () => {
+      videoPlayer.setAttribute("visible", true);
+      henriotPreviewButton.setAttribute("visible", false);
+      const testVideo = document.createElement("video");
+      document.querySelector("#henriot-video-link").setAttribute("src", "./src/video/henriot.mp4");
+      document.querySelector("#henriot-video-mp4").play();
+      // const canplayWebm = testVideo.canPlayType('video/webm; codecs="vp8, vorbis"');
+      // if (canplayWebm == "") {
+      //   document.querySelector("#henriot-video-link").setAttribute("src", "henriot-video-mp4");
+      //   document.querySelector("#henriot-video-mp4").play();
+      // } else {
+      //   document.querySelector("#henriot-video-link").setAttribute("src", "henriot-video-webm");
+      //   document.querySelector("#henriot-video-webm").play();
+      // }
+    });
+
+    textAssemb.addEventListener('click', () => {
+      window.location.href = "https://www.champagne-henriot.com/en/age-gate/";
+    });
+  
+    </script>
+  </body>
+</html>
